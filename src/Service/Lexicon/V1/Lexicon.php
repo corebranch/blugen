@@ -40,7 +40,7 @@ class Lexicon implements LexiconInterface
 
     public function description(): ?string
     {
-        return $this->lexicon['description'];
+        return $this->lexicon['description'] ?? null;
     }
 
     public function defs(): array
