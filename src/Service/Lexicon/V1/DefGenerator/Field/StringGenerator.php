@@ -22,7 +22,14 @@ class StringGenerator implements GeneratorInterface
     public function __construct(private readonly StringTypeDefinition $definition)
     {
         $this->validateDefinition();
-        $this->initializePhpStructure();
+        [$namespaceStr, $enumName] = NamespaceResolver::namespace(
+            $this->definition->lexicon(),
+            $this->definition
+        );
+
+        $this->file = new PhpFile();
+        $this->namespace = $this->file->addNamespace($namespaceStr);
+        $this->enum = $this->namespace->addEnum($enumName);
     }
 
     public function generate(): string
@@ -45,18 +52,6 @@ class StringGenerator implements GeneratorInterface
         if (!$this->definition->knownValues()) {
             throw new InvalidArgumentException('StringTypeDefinition must have known values to generate enum');
         }
-    }
-
-    private function initializePhpStructure(): void
-    {
-        [$namespaceStr, $enumName] = NamespaceResolver::namespace(
-            $this->definition->lexicon(),
-            $this->definition
-        );
-
-        $this->file = new PhpFile();
-        $this->namespace = $this->file->addNamespace($namespaceStr);
-        $this->enum = $this->namespace->addEnum($enumName);
     }
 
     private function addEnumCase(string $value): void
