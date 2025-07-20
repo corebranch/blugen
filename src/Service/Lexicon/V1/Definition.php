@@ -25,7 +25,7 @@ class Definition implements DefinitionInterface
             $name = 'main';
         }
 
-        return new self($lexicon, ltrim($name, '#'));
+        return new self($lexicon, str_starts_with($name, '#') ? substr($name, 1) : $name);
     }
 
     public function name(): string
