@@ -21,9 +21,20 @@ class Lexicon implements LexiconInterface
     public static function fromNsid(Nsid $nsid): LexiconInterface
     {
         $path = NsidResolver::path($nsid);
+        $nsid = $nsid->full();
+
+        if (! file_exists($path)) {
+            throw new \Error("The \"$nsid\" file does not exist: \"$path\"");
+        }
+
         $content = file_get_contents($path);
 
-        $toArray = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        try {
+            $toArray = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            $realpath = realpath($path);
+            throw new \JsonException("The \"$nsid\" does not contain valid JSON: $realpath");
+        }
 
         return new Lexicon($toArray);
     }
@@ -35,7 +46,7 @@ class Lexicon implements LexiconInterface
 
     public function version(): int
     {
-        return $this->lexicon['version'];
+        return $this->lexicon['lexicon'];
     }
 
     public function description(): ?string
