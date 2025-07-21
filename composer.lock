@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "kongulov/interact-with-enum",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kongulov/interact-with-enum.git",
-                "reference": "89acf4725e0408a7c1945d239fdf519eb1076224"
+                "reference": "e5a0571a51f17ca5019219a843a935989e2974a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kongulov/interact-with-enum/zipball/89acf4725e0408a7c1945d239fdf519eb1076224",
-                "reference": "89acf4725e0408a7c1945d239fdf519eb1076224",
+                "url": "https://api.github.com/repos/kongulov/interact-with-enum/zipball/e5a0571a51f17ca5019219a843a935989e2974a0",
+                "reference": "e5a0571a51f17ca5019219a843a935989e2974a0",
                 "shasum": ""
             },
             "require": {
@@ -48,9 +48,15 @@
             ],
             "support": {
                 "issues": "https://github.com/kongulov/interact-with-enum/issues",
-                "source": "https://github.com/kongulov/interact-with-enum/tree/1.0.0"
+                "source": "https://github.com/kongulov/interact-with-enum/tree/1.1.0"
             },
-            "time": "2023-06-28T19:30:17+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/kongulov",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-04-04T19:17:17+00:00"
         },
         {
             "name": "nette/php-generator",
