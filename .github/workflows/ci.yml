@@ -43,6 +43,12 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
+      - name: Generate lexicon code
+        run: ./bin/blugen generate
+
+      - name: Verify generated code
+        run: test -f generated/Com/Atproto/Server/CreateSessionSchema.php && echo "Code generation successful"
+
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse --error-format github src tests
 
@@ -53,9 +59,6 @@ jobs:
           else
             vendor/bin/phpunit
           fi
-
-      - name: Test code generation
-        run: ./bin/blugen generate --help
 
       - name: Upload coverage
         if: matrix.coverage
