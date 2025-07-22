@@ -42,7 +42,7 @@ class InputSchema implements SchemaInterface
         if ($schema) {
             $schema = new Schema($schema);
         } else {
-            return null;
+            return new ObjectSchema(new Schema([]));
         }
 
         $class = match ($schema->type()) {

@@ -46,7 +46,7 @@ class ProcedureTypeDefinition implements DefinitionInterface
         $input = $this->__get('input');
 
         if ($input === null) {
-            return null;
+            $input = [];
         }
 
         return new InputSchema(new Schema($input));

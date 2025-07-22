@@ -31,7 +31,7 @@ class ObjectSchema implements SchemaInterface
     {
         $nullable = $this->nullable() ?? [];
         $required = $this->required() ?? [];
-        $properties = $this->__get('properties');
+        $properties = $this->__get('properties') ?? [];
 
         return array_map(fn (string $name, array $rawSchema) => new Property(
             $name,
