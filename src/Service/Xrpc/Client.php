@@ -119,11 +119,8 @@ class Client implements ClientInterface
                 $e
             ];
 
-            $exception = class_exists($class = "\\Blugen\\Service\\Xrpc\\Exception\\$errorResponse[error]")
-                ? $class
-                : XrpcException::class;
-
-            throw new $exception(...$errorParameters);
+            $exceptionClass = $this->getValidExceptionClass($errorResponse['error'] ?? '');
+            throw new $exceptionClass(...$errorParameters);
         } catch (\Throwable $e) {
             throw new XrpcException($e->getMessage(), $e->getCode(), $e);
         }
@@ -136,6 +133,31 @@ class Client implements ClientInterface
         $definition = Definition::fromNsid($nsid);
         [$namespace, $className] = NamespaceResolver::namespace($definition->lexicon(), $definition);
 
-        return new ("\\$namespace\\$className")($parameter);
+        $fullClassName = "\\$namespace\\$className";
+
+        if (!class_exists($fullClassName)) {
+            throw new \InvalidArgumentException("Callable class not found: $fullClassName");
+        }
+
+        if (!is_subclass_of($fullClassName, CallableInterface::class)) {
+            throw new \InvalidArgumentException("Class does not implement CallableInterface: $fullClassName");
+        }
+
+        return new $fullClassName($parameter);
+    }
+
+    private function getValidExceptionClass(string $errorType): string
+    {
+        if (empty($errorType)) {
+            return XrpcException::class;
+        }
+
+        $exceptionClass = "\\Blugen\\Service\\Xrpc\\Exception\\$errorType";
+        
+        if (class_exists($exceptionClass) && is_subclass_of($exceptionClass, XrpcException::class)) {
+            return $exceptionClass;
+        }
+
+        return XrpcException::class;
     }
 }
