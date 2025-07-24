@@ -12,7 +12,6 @@ class DataProviderFactory
         return match (true) {
             $callable instanceof QueryInterface => new QueryDataAdapter($callable),
             $callable instanceof ProcedureInterface => new ProcedureDataAdapter($callable),
-            default => throw new \InvalidArgumentException('Unsupported callable type')
         };
     }
 }
