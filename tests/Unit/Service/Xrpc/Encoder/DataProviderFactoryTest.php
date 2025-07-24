@@ -1,6 +1,6 @@
 <?php
 
-namespace Blugen\Tests\Unit\Service\Service\Xrpc\Encoder;
+namespace Blugen\Tests\Unit\Service\Xrpc\Encoder;
 
 use Blugen\Service\Lexicon\ProcedureInterface;
 use Blugen\Service\Lexicon\QueryInterface;
