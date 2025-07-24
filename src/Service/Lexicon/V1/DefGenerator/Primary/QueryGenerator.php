@@ -57,10 +57,6 @@ class QueryGenerator implements GeneratorInterface
             ComponentGeneratorFactory::create($paramsClass, $property)->generate();
         }
 
-//        $this->class->addProperty(new Literal("params"))
-//            ->setPrivate()
-//            ->setType($paramsNamespace);
-
         $this->class->addMethod(new Literal("setParams"))
             ->setComment("@var \\$paramsNamespace \$params")
             ->setPublic()
