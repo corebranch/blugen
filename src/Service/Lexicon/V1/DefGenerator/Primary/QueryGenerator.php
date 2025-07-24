@@ -2,6 +2,7 @@
 
 namespace Blugen\Service\Lexicon\V1\DefGenerator\Primary;
 
+use Blugen\Enum\ClassNameSuffix;
 use Blugen\Service\Lexicon\GeneratorInterface;
 use Blugen\Service\Lexicon\ParamsInterface;
 use Blugen\Service\Lexicon\QueryInterface;
@@ -46,7 +47,7 @@ class QueryGenerator implements GeneratorInterface
         $paramsFile = new PhpFile();
         $paramsFile->setStrictTypes();
         $paramsPhpNamespace = $paramsFile->addNamespace($this->namespaceString);
-        $paramsClassName = "{$this->className}Params";
+        $paramsClassName = "{$this->className}" . ClassNameSuffix::PARAMS->value;
         $paramsNamespace = sprintf("%s\\%s", $paramsPhpNamespace->getName(), $paramsClassName);
         $paramsClass = $paramsPhpNamespace->addClass($paramsClassName);
         $paramsClass->addImplement(ParamsInterface::class);

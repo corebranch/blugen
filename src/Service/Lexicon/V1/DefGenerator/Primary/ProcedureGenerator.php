@@ -2,6 +2,7 @@
 
 namespace Blugen\Service\Lexicon\V1\DefGenerator\Primary;
 
+use Blugen\Enum\ClassNameSuffix;
 use Blugen\Service\Lexicon\GeneratorInterface;
 use Blugen\Service\Lexicon\InputInterface;
 use Blugen\Service\Lexicon\ProcedureInterface;
@@ -69,7 +70,7 @@ class ProcedureGenerator implements GeneratorInterface
             $schemaFile = new PhpFile();
             $schemaFile->setStrictTypes();
             $schemaPhpNamespace = $schemaFile->addNamespace($this->namespaceString);
-            $schemaClassName = "{$this->className}Schema";
+            $schemaClassName = "{$this->className}" . ClassNameSuffix::INPUT->value;
             $schemaNamespace = sprintf("%s\\%s", $schemaPhpNamespace->getName(), $schemaClassName);
             $schemaClass = $schemaPhpNamespace->addClass($schemaClassName);
             $schemaClass->addImplement(InputInterface::class);

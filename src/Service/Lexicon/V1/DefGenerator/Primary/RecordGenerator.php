@@ -2,6 +2,7 @@
 
 namespace Blugen\Service\Lexicon\V1\DefGenerator\Primary;
 
+use Blugen\Enum\ClassNameSuffix;
 use Blugen\Service\Lexicon\GeneratorInterface;
 use Blugen\Service\Lexicon\V1\Factory\ComponentGeneratorFactory;
 use Blugen\Service\Lexicon\V1\Resolver\NamespaceResolver;
@@ -32,7 +33,7 @@ class RecordGenerator implements GeneratorInterface
                 throw $e;
             }
 
-            $this->class = $this->namespace->addClass("{$className}Definition");
+            $this->class = $this->namespace->addClass("{$className}" . ClassNameSuffix::DEFINITION->value);
         }
         $this->file->setStrictTypes();
     }
