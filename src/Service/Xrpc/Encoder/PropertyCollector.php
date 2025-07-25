@@ -16,7 +16,7 @@ class PropertyCollector
         return array_filter(array_merge(...array_map(
             fn($property) => $this->pair($property),
             $this->properties()
-        )));
+        )), fn ($value) => $value !== null);
     }
 
     private function pair(\ReflectionProperty $property): array

@@ -27,7 +27,7 @@ class StringComponentGenerator implements GeneratorInterface
 
     private function generateProperty(): void
     {
-        $this->class->addProperty($this->property->name())
+        $this->class->addProperty($this->property->name(), $this->schema->default())
             ->setPrivate()
             ->setType($this->type())
             ->setComment(implode("\n", $this->generateDocBlock()) . $this->description());

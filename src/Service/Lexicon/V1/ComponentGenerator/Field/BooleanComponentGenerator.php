@@ -27,7 +27,7 @@ class BooleanComponentGenerator implements GeneratorInterface
 
     private function generateProperty(): void
     {
-        $this->class->addProperty($this->property->name())
+        $this->class->addProperty($this->property->name(), $this->schema->default())
             ->setPrivate()
             ->setType($this->phpType())
             ->setComment("@var {$this->docType()}" . $this->description() . $this->extraDocBlock());
