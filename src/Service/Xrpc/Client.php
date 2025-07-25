@@ -86,10 +86,18 @@ class Client implements ClientInterface
             return $this->session;
         }
 
-        return $this->session = $this->call(
+        $this->session = $this->call(
             nsid('com.atproto.server.createSession'),
             (new CreateSessionInput())->setIdentifier($handle)->setPassword($password)
         )->toArray();
+
+        $this->httpClient = $this->httpClient->withOptions([
+            'headers' => [
+                'Authorization' => "Bearer {$this->session['accessJwt']}"
+            ]
+        ]);
+
+        return $this->session;
     }
 
     /**
