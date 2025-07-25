@@ -24,8 +24,8 @@ class DataProviderFactoryTest extends TestCase
     public static function expected_adapters(): array
     {
         return [
-            ['mock' => ProcedureInterface::class, 'expeceted' => ProcedureDataAdapter::class],
-            ['mock' => QueryInterface::class, 'expeceted' => QueryDataAdapter::class],
+            ['mock' => ProcedureInterface::class, 'expected' => ProcedureDataAdapter::class],
+            ['mock' => QueryInterface::class, 'expected' => QueryDataAdapter::class],
         ];
     }
 }
