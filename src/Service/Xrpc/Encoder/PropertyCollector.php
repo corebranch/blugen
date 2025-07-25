@@ -2,11 +2,15 @@
 
 namespace Blugen\Service\Xrpc\Encoder;
 
+use Blugen\Service\Lexicon\InputInterface;
+use Blugen\Service\Lexicon\ParamsInterface;
 use ReflectionClass;
 use ReflectionProperty;
 
 class PropertyCollector
 {
+    private InputInterface|ParamsInterface|null $data = null;
+
     public function __construct(private readonly DataProvider $dataProvider)
     {
     }
@@ -19,7 +23,7 @@ class PropertyCollector
         )), fn ($value) => $value !== null);
     }
 
-    private function pair(\ReflectionProperty $property): array
+    private function pair(ReflectionProperty $property): array
     {
         return [$this->name($property) => $this->value($property)];
     }
@@ -31,8 +35,7 @@ class PropertyCollector
 
     private function value(ReflectionProperty $property)
     {
-        $data = $this->dataProvider->getData();
-
+        $data = $this->getData();
         return $property->isInitialized($data)
             ? $property->getValue($data) ?? null
             : null;
@@ -40,7 +43,12 @@ class PropertyCollector
 
     private function properties(): array
     {
-        return (new ReflectionClass($this->dataProvider->getData()))
+        return (new ReflectionClass($this->getData()))
             ->getProperties();
+    }
+
+    private function getData(): object
+    {
+        return $this->data ??= $this->dataProvider->getData();
     }
 }

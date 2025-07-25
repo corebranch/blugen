@@ -118,6 +118,10 @@ class PropertyCollectorTest extends TestCase
             'integer' => [42, 42],
             'float' => [3.14, 3.14],
             'boolean_true' => [true, true],
+            'boolean_false' => [false, false],
+            'zero_integer' => [0, 0],
+            'empty_string' => ['', ''],
+            'empty_array' => [[], []],
             'array' => [['a', 'b', 'c'], ['a', 'b', 'c']],
             'object' => [(object)['key' => 'value'], (object)['key' => 'value']],
         ];
