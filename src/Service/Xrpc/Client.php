@@ -9,10 +9,9 @@ use Blugen\Service\Lexicon\V1\Nsid;
 use Blugen\Service\Lexicon\V1\Resolver\NamespaceResolver;
 use Blugen\Service\Xrpc\Exception\ExpiredToken;
 use Blugen\Service\Xrpc\Exception\XrpcException;
-use BlugenGenerator\App\Bsky\Actor\GetProfileParams;
-use BlugenGenerator\Com\Atproto\Server\CreateSessionSchema;
+use BlugenGenerator\Com\Atproto\Server\CreateSessionInput;
 use BlugenGenerator\Com\Atproto\Server\GetSessionParams;
-use BlugenGenerator\Com\Atproto\Server\RefreshSessionSchema;
+use BlugenGenerator\Com\Atproto\Server\RefreshSessionInput;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -60,7 +59,7 @@ class Client implements ClientInterface
 
                 $renewedSession = $this->call(
                     nsid('com.atproto.server.refreshSession'),
-                    new RefreshSessionSchema()
+                    new RefreshSessionInput()
                 );
 
                 $this->httpClient = $this->httpClient->withOptions([
@@ -74,7 +73,7 @@ class Client implements ClientInterface
             } catch (ExpiredToken $e) {
                 $createdSession = $this->call(
                     \nsid('com.atproto.server.createSession'),
-                    (new CreateSessionSchema())->setIdentifier($handle)->setPassword($password)
+                    (new CreateSessionInput())->setIdentifier($handle)->setPassword($password)
                 );
 
                 $this->httpClient = $this->httpClient->withOptions([
@@ -89,7 +88,7 @@ class Client implements ClientInterface
 
         return $this->session = $this->call(
             nsid('com.atproto.server.createSession'),
-            (new CreateSessionSchema())->setIdentifier($handle)->setPassword($password)
+            (new CreateSessionInput())->setIdentifier($handle)->setPassword($password)
         )->toArray();
     }
 
@@ -153,7 +152,7 @@ class Client implements ClientInterface
         }
 
         $exceptionClass = "\\Blugen\\Service\\Xrpc\\Exception\\$errorType";
-        
+
         if (class_exists($exceptionClass) && is_subclass_of($exceptionClass, XrpcException::class)) {
             return $exceptionClass;
         }
