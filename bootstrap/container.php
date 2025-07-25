@@ -3,6 +3,20 @@
 use Symfony\Component\Console\Input\ArgvInput;
 
 return (function () {
+    // Ensure autoloader is loaded for CLI context
+    $possibleAutoloaders = [
+        __DIR__ . '/../../../autoload.php',              // When installed in vendor/shahmal1yev/blugen
+        __DIR__ . '/../vendor/autoload.php',             // When using the package directly  
+        __DIR__ . '/../../../vendor/autoload.php',       // Alternative location
+    ];
+
+    foreach ($possibleAutoloaders as $file) {
+        if (file_exists($file)) {
+            require_once $file;
+            break;
+        }
+    }
+
     // Try to get the container (will auto-bootstrap if needed)
     try {
         $container = \Blugen\Container::get();
