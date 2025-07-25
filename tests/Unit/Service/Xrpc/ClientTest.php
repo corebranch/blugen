@@ -11,14 +11,40 @@ use Blugen\Service\Xrpc\Client;
 use Blugen\Service\Xrpc\Exception\ExpiredToken;
 use Blugen\Service\Xrpc\Exception\XrpcException;
 use Blugen\Tests\TestCase;
-use BlugenGenerator\Com\Atproto\Server\CreateSessionInput;
-use BlugenGenerator\Com\Atproto\Server\GetSessionParams;
-use BlugenGenerator\Com\Atproto\Server\RefreshSessionInput;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+
+// Stub classes to avoid dependency on generated code
+class TestGetSessionParams implements ParamsInterface
+{
+    // Empty implementation for testing
+}
+
+class TestRefreshSessionInput implements InputInterface
+{
+    // Empty implementation for testing
+}
+
+class TestCreateSessionInput implements InputInterface
+{
+    private string $identifier = '';
+    private string $password = '';
+    
+    public function setIdentifier(string $identifier): self
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+    
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+        return $this;
+    }
+}
 
 class TestableClient extends Client
 {
@@ -44,9 +70,9 @@ class TestableClient extends Client
         $nsidString = $nsid->full();
         
         return match ([$nsidString, $suffix]) {
-            ['com.atproto.server.getSession', ClassNameSuffix::PARAMS] => new GetSessionParams(),
-            ['com.atproto.server.refreshSession', ClassNameSuffix::INPUT] => new RefreshSessionInput(),
-            ['com.atproto.server.createSession', ClassNameSuffix::INPUT] => new CreateSessionInput(),
+            ['com.atproto.server.getSession', ClassNameSuffix::PARAMS] => new TestGetSessionParams(),
+            ['com.atproto.server.refreshSession', ClassNameSuffix::INPUT] => new TestRefreshSessionInput(),
+            ['com.atproto.server.createSession', ClassNameSuffix::INPUT] => new TestCreateSessionInput(),
             default => parent::createParameterClass($nsid, $suffix)
         };
     }
@@ -138,7 +164,7 @@ class ClientTest extends TestCase
     public function test_call_with_valid_request(): void
     {
         $nsid = nsid('com.atproto.server.getSession');
-        $params = new GetSessionParams();
+        $params = new TestGetSessionParams();
 
         $response = $this->createMock(ResponseInterface::class);
 
@@ -160,7 +186,7 @@ class ClientTest extends TestCase
     public function test_call_with_client_exception(): void
     {
         $nsid = nsid('com.atproto.server.getSession');
-        $params = new GetSessionParams();
+        $params = new TestGetSessionParams();
 
         $errorResponse = $this->createMock(ResponseInterface::class);
         $errorResponse->method('toArray')->willReturn([
@@ -187,7 +213,7 @@ class ClientTest extends TestCase
     public function test_call_with_transport_exception(): void
     {
         $nsid = nsid('com.atproto.server.getSession');
-        $params = new GetSessionParams();
+        $params = new TestGetSessionParams();
 
         $this->mockCallable->expects($this->any())->method('method')->willReturn('GET');
         $this->mockCallable->expects($this->any())->method('path')->willReturn('com.atproto.server.getSession');
@@ -210,7 +236,7 @@ class ClientTest extends TestCase
     public function test_call_with_generic_exception(): void
     {
         $nsid = nsid('com.atproto.server.getSession');
-        $params = new GetSessionParams();
+        $params = new TestGetSessionParams();
 
         $this->mockCallable->expects($this->any())->method('method')->willReturn('GET');
         $this->mockCallable->expects($this->any())->method('path')->willReturn('com.atproto.server.getSession');
