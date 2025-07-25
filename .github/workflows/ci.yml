@@ -47,7 +47,7 @@ jobs:
         run: ./bin/blugen generate
 
       - name: Verify generated code
-        run: test -f generated/Com/Atproto/Server/CreateSessionSchema.php && echo "Code generation successful"
+        run: test -f generated/Com/Atproto/Server/CreateSessionInput.php && echo "Code generation successful"
 
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse --error-format github src tests
