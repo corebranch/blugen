@@ -12,145 +12,185 @@ use Blugen\Service\Xrpc\Exception\XrpcException;
 use BlugenGenerator\Com\Atproto\Server\CreateSessionInput;
 use BlugenGenerator\Com\Atproto\Server\GetSessionParams;
 use BlugenGenerator\Com\Atproto\Server\RefreshSessionInput;
-use Symfony\Component\HttpClient\HttpClient;
+use InvalidArgumentException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Throwable;
 
 class Client implements ClientInterface
 {
-    private array $session = [];
+    private SessionManager $sessionManager;
+    private HttpClientInterface $httpClient;
 
     public function __construct(
-        ?string                                                    $baseUrl = null,
-        private ?\Symfony\Contracts\HttpClient\HttpClientInterface $httpClient = null
+        ?string $baseUrl = null,
+        ?HttpClientInterface $httpClient = null
     )
     {
-        $this->httpClient = $httpClient ?? HttpClient::create()->withOptions(array_merge(
-            config()->get('client.default_options'),
-            ['base_uri' => sprintf(
-                "%s/xrpc/",
-                $baseUrl ?? config()->get('client.default_options.base_uri')
-            )]
-        ));
+        $this->sessionManager = new SessionManager();
+        $this->httpClient = $httpClient ?? HttpClientFactory::create($baseUrl);
     }
 
+    /**
+     * @throws XrpcException
+     */
     public function login(string $handle, string $password, ?array $session = null): array
     {
-        if (is_array($session) && isset($session['accessJwt']) && isset($session['refreshJwt'])) {
-            $this->httpClient = $this->httpClient->withOptions([
-                'headers' => ['Authorization' => "Bearer $session[accessJwt]"]
-            ]);
-
-            try {
-                $validatedSession = $this->call(
-                    nsid('com.atproto.server.getSession'),
-                    new GetSessionParams()
-                )->toArray();
-
-                $this->httpClient = $this->httpClient->withOptions([
-                    'headers' => ['Authorization' => "Bearer $validatedSession[accessJwt]"]
-                ]);
-
-                $this->session = $session;
-            } catch (ExpiredToken $e) {
-                $this->httpClient = $this->httpClient->withOptions([
-                    'headers' => ['Authorization' => "Bearer $session[refreshJwt]"]
-                ]);
-
-                $renewedSession = $this->call(
-                    nsid('com.atproto.server.refreshSession'),
-                    new RefreshSessionInput()
-                );
-
-                $this->httpClient = $this->httpClient->withOptions([
-                    'headers' => ['Authorization' => "Bearer $renewedSession[accessJwt]"]
-                ]);
-
-                $this->session = $this->call(
-                    nsid('com.atproto.server.getSession'),
-                    new GetSessionParams()
-                )->toArray();
-            } catch (ExpiredToken $e) {
-                $createdSession = $this->call(
-                    \nsid('com.atproto.server.createSession'),
-                    (new CreateSessionInput())->setIdentifier($handle)->setPassword($password)
-                );
-
-                $this->httpClient = $this->httpClient->withOptions([
-                    'headers' => ['Authorization' => "Bearer $createdSession[accessJwt]"]
-                ]);
-
-                $this->session = $createdSession->toArray();
-            }
-
-            return $this->session;
+        if ($this->hasValidExistingSession($session)) {
+            return $this->loginWithExistingSession($handle, $password, $session);
         }
 
-        $this->session = $this->call(
+        return $this->createNewSession($handle, $password);
+    }
+
+    public function getSession(): array
+    {
+        return $this->sessionManager->getSession();
+    }
+
+    private function hasValidExistingSession(?array $session): bool
+    {
+        return is_array($session) && isset($session['accessJwt'], $session['refreshJwt']);
+    }
+
+    /**
+     * @throws XrpcException
+     */
+    private function loginWithExistingSession(string $handle, string $password, array $session): array
+    {
+        $this->sessionManager->setSession($session);
+        $this->httpClient = HttpClientFactory::withAuthToken($this->httpClient, $session['accessJwt']);
+
+        try {
+            return $this->validateCurrentSession();
+        } catch (ExpiredToken) {
+            return $this->handleExpiredAccessToken($handle, $password);
+        }
+    }
+
+    /**
+     * @throws XrpcException
+     */
+    private function validateCurrentSession(): array
+    {
+        $validatedSession = $this->call(
+            nsid('com.atproto.server.getSession'),
+            new GetSessionParams()
+        )->toArray();
+
+        $this->sessionManager->updateFromResponse($validatedSession);
+        $this->httpClient = HttpClientFactory::withAuthToken($this->httpClient, $validatedSession['accessJwt']);
+
+        return $this->sessionManager->getSession();
+    }
+
+    /**
+     * @throws XrpcException
+     */
+    private function handleExpiredAccessToken(string $handle, string $password): array
+    {
+        try {
+            return $this->refreshSession();
+        } catch (ExpiredToken) {
+            return $this->createNewSession($handle, $password);
+        }
+    }
+
+    /**
+     * @throws XrpcException
+     * @throws ExpiredToken
+     */
+    private function refreshSession(): array
+    {
+        $refreshToken = $this->sessionManager->getRefreshToken();
+        $this->httpClient = HttpClientFactory::withAuthToken($this->httpClient, $refreshToken);
+
+        $renewedSession = $this->call(
+            nsid('com.atproto.server.refreshSession'),
+            new RefreshSessionInput()
+        )->toArray();
+
+        $this->sessionManager->updateFromResponse($renewedSession);
+        $this->httpClient = HttpClientFactory::withAuthToken($this->httpClient, $renewedSession['accessJwt']);
+
+        return $this->validateCurrentSession();
+    }
+
+    /**
+     * @throws XrpcException
+     */
+    private function createNewSession(string $handle, string $password): array
+    {
+        $createdSession = $this->call(
             nsid('com.atproto.server.createSession'),
             (new CreateSessionInput())->setIdentifier($handle)->setPassword($password)
         )->toArray();
 
-        $this->httpClient = $this->httpClient->withOptions([
-            'headers' => [
-                'Authorization' => "Bearer {$this->session['accessJwt']}"
-            ]
-        ]);
+        $this->sessionManager->setSession($createdSession);
+        $this->httpClient = HttpClientFactory::withAuthToken($this->httpClient, $createdSession['accessJwt']);
 
-        return $this->session;
+        return $this->sessionManager->getSession();
     }
 
     /**
-     * @param Nsid $nsid
-     * @param ParamsInterface|InputInterface $parameter
-     * @return ResponseInterface
      * @throws XrpcException
      */
     public function call(Nsid $nsid, ParamsInterface|InputInterface|null $parameter = null): ResponseInterface
     {
-        $callable = $this->callable($nsid, $parameter);
+        $callable = $this->createCallable($nsid, $parameter);
 
         try {
-            // trigger exception if exist
-            $response = $this->httpClient->request(
+            return $this->httpClient->request(
                 $callable->method(),
                 $callable->path(),
                 $callable->options()
             );
-        } catch (ClientExceptionInterface $e) {
-            $errorResponse = $e->getResponse()->toArray();
-
-            $errorParameters = [
-                $errorResponse['message'] ?? 'Bad Request',
-                $e->getResponse()->getStatusCode() ?? 400,
-                $e
-            ];
-
-            $exceptionClass = $this->getValidExceptionClass($errorResponse['error'] ?? '');
-            throw new $exceptionClass(...$errorParameters);
-        } catch (\Throwable $e) {
+        } catch (ClientExceptionInterface|TransportExceptionInterface $e) {
+            throw $this->handleClientException($e);
+        } catch (Throwable $e) {
             throw new XrpcException($e->getMessage(), $e->getCode(), $e);
         }
-
-        return $response;
     }
 
-    private function callable(Nsid $nsid, ParamsInterface|InputInterface|null $parameter): CallableInterface
+    protected function createCallable(Nsid $nsid, ParamsInterface|InputInterface|null $parameter): CallableInterface
     {
         $definition = Definition::fromNsid($nsid);
         [$namespace, $className] = NamespaceResolver::namespace($definition->lexicon(), $definition);
 
         $fullClassName = "\\$namespace\\$className";
 
+        $this->validateCallableClass($fullClassName);
+
+        return new $fullClassName($parameter);
+    }
+
+    private function validateCallableClass(string $fullClassName): void
+    {
         if (!class_exists($fullClassName)) {
-            throw new \InvalidArgumentException("Callable class not found: $fullClassName");
+            throw new InvalidArgumentException("Callable class not found: $fullClassName");
         }
 
         if (!is_subclass_of($fullClassName, CallableInterface::class)) {
-            throw new \InvalidArgumentException("Class does not implement CallableInterface: $fullClassName");
+            throw new InvalidArgumentException("Class does not implement CallableInterface: $fullClassName");
+        }
+    }
+
+    private function handleClientException(ClientExceptionInterface|TransportExceptionInterface $e): XrpcException
+    {
+        if ($e instanceof TransportExceptionInterface) {
+            return new XrpcException($e->getMessage(), $e->getCode(), $e);
         }
 
-        return new $fullClassName($parameter);
+        $errorResponse = $e->getResponse()->toArray();
+        $errorMessage = $errorResponse['message'] ?? 'Bad Request';
+        $statusCode = $e->getResponse()->getStatusCode() ?? 400;
+        $errorType = $errorResponse['error'] ?? '';
+
+        $exceptionClass = $this->getValidExceptionClass($errorType);
+        
+        return new $exceptionClass($errorMessage, $statusCode, $e);
     }
 
     private function getValidExceptionClass(string $errorType): string
