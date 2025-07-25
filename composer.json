@@ -1,5 +1,5 @@
 {
-    "name": "corebranch/blugen",
+    "name": "shahmal1yev/blugen",
     "description": "Code generator based on ATProto lexicons.",
     "type": "library",
     "minimum-stability": "stable",

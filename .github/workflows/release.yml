@@ -42,7 +42,7 @@ jobs:
             ## Installation
             
             ```bash
-            composer require corebranch/blugen:^${{ steps.version.outputs.version }}
+            composer require shahmal1yev/blugen:^${{ steps.version.outputs.version }}
             ```
           draft: false
           prerelease: false

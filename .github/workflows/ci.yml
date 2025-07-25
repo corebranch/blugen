@@ -15,7 +15,7 @@ jobs:
       matrix:
         php-version: ['8.1', '8.2', '8.3', '8.4']
         include:
-          - php-version: '8.2'
+          - php-version: '8.1'
             coverage: true
 
     name: PHP ${{ matrix.php-version }}
@@ -65,7 +65,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          files: ./coverage.xml
           fail_ci_if_error: false
 
   security:

@@ -26,7 +26,7 @@ For production use, please refer to [official releases](https://github.com/shahm
 ### Using Composer
 
 ```bash
-composer require corebranch/blugen
+composer require shahmal1yev/blugen
 ```
 
 ### Development Installation

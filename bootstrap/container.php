@@ -11,7 +11,7 @@ return (function () {
     // Find the appropriate autoloader
     $possibleAutoloaders = [
         __DIR__ . '/../vendor/autoload.php',             // When using the package directly
-        __DIR__ . '/../../../autoload.php',              // When installed in vendor/corebranch/blugen
+        __DIR__ . '/../../../autoload.php',              // When installed in vendor/shahmal1yev/blugen
         __DIR__ . '/../../../vendor/autoload.php',       // Alternative location
     ];
 
