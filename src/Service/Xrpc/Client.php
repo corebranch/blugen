@@ -2,6 +2,7 @@
 
 namespace Blugen\Service\Xrpc;
 
+use Blugen\Enum\ClassNameSuffix;
 use Blugen\Service\Lexicon\InputInterface;
 use Blugen\Service\Lexicon\ParamsInterface;
 use Blugen\Service\Lexicon\V1\Definition;
@@ -9,9 +10,6 @@ use Blugen\Service\Lexicon\V1\Nsid;
 use Blugen\Service\Lexicon\V1\Resolver\NamespaceResolver;
 use Blugen\Service\Xrpc\Exception\ExpiredToken;
 use Blugen\Service\Xrpc\Exception\XrpcException;
-use BlugenGenerator\Com\Atproto\Server\CreateSessionInput;
-use BlugenGenerator\Com\Atproto\Server\GetSessionParams;
-use BlugenGenerator\Com\Atproto\Server\RefreshSessionInput;
 use InvalidArgumentException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -76,8 +74,8 @@ class Client implements ClientInterface
     private function validateCurrentSession(): array
     {
         $validatedSession = $this->call(
-            nsid('com.atproto.server.getSession'),
-            new GetSessionParams()
+            $nsid = nsid('com.atproto.server.getSession'),
+            $this->createParameterClass($nsid, ClassNameSuffix::PARAMS)
         )->toArray();
 
         $this->sessionManager->updateFromResponse($validatedSession);
@@ -108,8 +106,8 @@ class Client implements ClientInterface
         $this->httpClient = HttpClientFactory::withAuthToken($this->httpClient, $refreshToken);
 
         $renewedSession = $this->call(
-            nsid('com.atproto.server.refreshSession'),
-            new RefreshSessionInput()
+            $nsid = nsid('com.atproto.server.refreshSession'),
+            $this->createParameterClass($nsid, ClassNameSuffix::INPUT)
         )->toArray();
 
         $this->sessionManager->updateFromResponse($renewedSession);
@@ -123,9 +121,12 @@ class Client implements ClientInterface
      */
     private function createNewSession(string $handle, string $password): array
     {
+        $createSessionInput = $this->createParameterClass($nsid = nsid('com.atproto.server.createSession'), ClassNameSuffix::INPUT);
+        $createSessionInput->setIdentifier($handle)->setPassword($password);
+        
         $createdSession = $this->call(
-            nsid('com.atproto.server.createSession'),
-            (new CreateSessionInput())->setIdentifier($handle)->setPassword($password)
+            $nsid,
+            $createSessionInput
         )->toArray();
 
         $this->sessionManager->setSession($createdSession);
@@ -164,6 +165,23 @@ class Client implements ClientInterface
         $this->validateCallableClass($fullClassName);
 
         return new $fullClassName($parameter);
+    }
+
+    /**
+     * Create parameter or input class instance dynamically based on NSID and suffix
+     */
+    protected function createParameterClass(Nsid $nsid, ClassNameSuffix $suffix): ParamsInterface|InputInterface
+    {
+        $definition = Definition::fromNsid($nsid);
+        [$namespace, $baseClassName] = NamespaceResolver::namespace($definition->lexicon(), $definition);
+        
+        $fullClassName = "\\$namespace\\$baseClassName{$suffix->value}";
+        
+        if (!class_exists($fullClassName)) {
+            throw new InvalidArgumentException("Parameter class not found: $fullClassName");
+        }
+        
+        return new $fullClassName();
     }
 
     private function validateCallableClass(string $fullClassName): void

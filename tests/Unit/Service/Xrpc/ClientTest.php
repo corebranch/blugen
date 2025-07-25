@@ -2,6 +2,7 @@
 
 namespace Blugen\Tests\Unit\Service\Xrpc;
 
+use Blugen\Enum\ClassNameSuffix;
 use Blugen\Service\Lexicon\InputInterface;
 use Blugen\Service\Lexicon\ParamsInterface;
 use Blugen\Service\Lexicon\V1\Nsid;
@@ -10,7 +11,9 @@ use Blugen\Service\Xrpc\Client;
 use Blugen\Service\Xrpc\Exception\ExpiredToken;
 use Blugen\Service\Xrpc\Exception\XrpcException;
 use Blugen\Tests\TestCase;
+use BlugenGenerator\Com\Atproto\Server\CreateSessionInput;
 use BlugenGenerator\Com\Atproto\Server\GetSessionParams;
+use BlugenGenerator\Com\Atproto\Server\RefreshSessionInput;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -33,6 +36,19 @@ class TestableClient extends Client
             return $this->mockCallable;
         }
         return parent::createCallable($nsid, $parameter);
+    }
+
+    protected function createParameterClass(Nsid $nsid, ClassNameSuffix $suffix): ParamsInterface|InputInterface
+    {
+        // Return hardcoded classes to avoid lexicon file dependencies in tests
+        $nsidString = $nsid->full();
+        
+        return match ([$nsidString, $suffix]) {
+            ['com.atproto.server.getSession', ClassNameSuffix::PARAMS] => new GetSessionParams(),
+            ['com.atproto.server.refreshSession', ClassNameSuffix::INPUT] => new RefreshSessionInput(),
+            ['com.atproto.server.createSession', ClassNameSuffix::INPUT] => new CreateSessionInput(),
+            default => parent::createParameterClass($nsid, $suffix)
+        };
     }
 }
 
