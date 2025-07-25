@@ -41,27 +41,36 @@ class Container
         self::$autoBootstrapAttempted = true;
 
         try {
-            // Find the appropriate autoloader
-            $possibleAutoloaders = [
-                __DIR__ . '/../../../../autoload.php',              // When installed in vendor/shahmal1yev/blugen
-                __DIR__ . '/../vendor/autoload.php',               // When using the package directly
-                __DIR__ . '/../../../vendor/autoload.php',         // Alternative location
-            ];
-
-            $autoloader = null;
-            foreach ($possibleAutoloaders as $file) {
-                if (file_exists($file)) {
-                    $autoloader = $file;
+            // Get the already loaded ClassLoader from Composer
+            $classLoader = null;
+            
+            // Try to get ClassLoader from registered autoloaders
+            foreach (spl_autoload_functions() as $autoloader) {
+                if (is_array($autoloader) && $autoloader[0] instanceof ClassLoader) {
+                    $classLoader = $autoloader[0];
                     break;
                 }
             }
 
-            if ($autoloader === null) {
-                return; // Fail silently, let the LogicException be thrown
+            // Fallback: try to find and require autoloader if not found
+            if (!$classLoader) {
+                $possibleAutoloaders = [
+                    __DIR__ . '/../../../../autoload.php',              // When installed in vendor/shahmal1yev/blugen
+                    __DIR__ . '/../vendor/autoload.php',               // When using the package directly
+                    __DIR__ . '/../../../vendor/autoload.php',         // Alternative location
+                ];
+
+                foreach ($possibleAutoloaders as $file) {
+                    if (file_exists($file)) {
+                        $classLoader = require $file;
+                        break;
+                    }
+                }
             }
 
-            /** @var ClassLoader $classLoader */
-            $classLoader = require $autoloader;
+            if (!$classLoader) {
+                return; // Fail silently
+            }
 
             // Load configurations
             $configManager = ConfigManager::load();
@@ -84,7 +93,7 @@ class Container
             // Set the container
             self::$container = $container;
         } catch (\Throwable $e) {
-            // Fail silently, let the original LogicException be thrown
+            // Fail silently to avoid breaking existing installations
             return;
         }
     }
