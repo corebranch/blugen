@@ -38,5 +38,8 @@
             "./bin/blugen generate",
             "php -l generated"
         ]
-    }
+    },
+    "bin": [
+        "bin/blugen"
+    ]
 }
