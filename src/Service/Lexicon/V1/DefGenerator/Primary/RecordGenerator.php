@@ -41,7 +41,7 @@ class RecordGenerator implements GeneratorInterface
     public function generate(): string
     {
         foreach ($this->definition->record()->properties() as $name => $property) {
-            ComponentGeneratorFactory::create($this->class, $property)->generate();
+            ComponentGeneratorFactory::create($this->class, $property, $this->definition->lexicon())->generate();
         }
 
         return $this->file->__toString();

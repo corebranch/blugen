@@ -33,7 +33,7 @@ class SubscriptionGenerator implements GeneratorInterface
         $this->class->addImplement(SubscriptionInterface::class);
 
         foreach($this->definition->parameters()?->properties() as $property) {
-            ComponentGeneratorFactory::create($this->class, $property)->generate();
+            ComponentGeneratorFactory::create($this->class, $property, $this->definition->lexicon())->generate();
         }
 
         return $this->file->__toString();

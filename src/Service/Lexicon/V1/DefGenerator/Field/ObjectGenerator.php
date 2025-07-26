@@ -41,7 +41,8 @@ class ObjectGenerator implements GeneratorInterface
                     new Schema($property),
                     in_array($name, $this->nullable(), true),
                     in_array($name, $this->required(), true),
-                )
+                ),
+                $this->definition->lexicon()
             )->generate();
         }
 

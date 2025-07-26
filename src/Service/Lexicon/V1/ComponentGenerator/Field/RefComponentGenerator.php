@@ -3,7 +3,9 @@
 namespace Blugen\Service\Lexicon\V1\ComponentGenerator\Field;
 
 use Blugen\Service\Lexicon\GeneratorInterface;
+use Blugen\Service\Lexicon\LexiconInterface;
 use Blugen\Service\Lexicon\V1\Property;
+use Blugen\Service\Lexicon\V1\Resolver\NamespaceResolver;
 use Blugen\Service\Lexicon\V1\Resolver\NsidResolver;
 use Blugen\Service\Lexicon\V1\TypeSpecificSchema\Field\RefSchema;
 use Nette\PhpGenerator\ClassType;
@@ -15,6 +17,7 @@ class RefComponentGenerator implements GeneratorInterface
     public function __construct(
         private readonly ClassType $class,
         private readonly Property $property,
+        private readonly ?LexiconInterface $lexicon = null,
     ) {
         $this->schema = new RefSchema($this->property->schema());
     }
@@ -65,14 +68,27 @@ class RefComponentGenerator implements GeneratorInterface
 
     private function phpType(): string
     {
-        $resolved = NsidResolver::namespace($this->schema->ref());
+        $resolved = $this->resolveNamespace();
         return $this->property->isRequired() ? $resolved : '?' . $resolved;
     }
 
     private function docType(): string
     {
-        $resolved = NsidResolver::namespace($this->schema->ref());
-        return $this->property->isRequired() ? $resolved : "{$resolved}|null";
+        $resolved = $this->resolveNamespace();
+        return $this->property->isRequired() ? "\\$resolved" : "\\{$resolved}|null";
+    }
+
+    private function resolveNamespace(): string
+    {
+        $ref = $this->schema->ref();
+        
+        // If ref starts with "#", it's a partial reference that needs the current lexicon's NSID
+        if (str_starts_with($ref, '#') && $this->lexicon !== null) {
+            $ref = $this->lexicon->nsid() . $ref;
+        }
+        
+        $resolved = NsidResolver::namespace($ref);
+        return NamespaceResolver::prefixed(ltrim($resolved, "\\"));
     }
 
     private function description(): string

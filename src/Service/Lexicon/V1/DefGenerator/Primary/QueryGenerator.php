@@ -54,7 +54,7 @@ class QueryGenerator implements GeneratorInterface
 
 
         foreach ($this->definition->parameters()?->properties() ?? [] as $property) {
-            ComponentGeneratorFactory::create($paramsClass, $property)->generate();
+            ComponentGeneratorFactory::create($paramsClass, $property, $this->definition->lexicon())->generate();
         }
 
         $this->class->addMethod(new Literal("setParams"))

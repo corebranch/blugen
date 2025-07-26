@@ -76,7 +76,7 @@ class ProcedureGenerator implements GeneratorInterface
             $schemaClass->addImplement(InputInterface::class);
 
             foreach($schema->properties() as $property) {
-                ComponentGeneratorFactory::create($schemaClass, $property)->generate();
+                ComponentGeneratorFactory::create($schemaClass, $property, $this->definition->lexicon())->generate();
             }
 
             $this->class->addMethod("setSchema")

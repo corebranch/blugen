@@ -4,6 +4,7 @@ namespace Blugen\Service\Lexicon\V1\ComponentGenerator\Field;
 
 use Blugen\Service\Lexicon\GeneratorInterface;
 use Blugen\Service\Lexicon\V1\Property;
+use Blugen\Service\Lexicon\V1\Resolver\NamespaceResolver;
 use Blugen\Service\Lexicon\V1\Resolver\NsidResolver;
 use Blugen\Service\Lexicon\V1\TypeSpecificSchema\Field\UnionSchema;
 use Nette\PhpGenerator\ClassType;
@@ -30,7 +31,10 @@ class UnionComponentGenerator implements GeneratorInterface
     private function generateProperty(): void
     {
         foreach ($this->schema->refs() as $ref) {
-            $this->class->getNamespace()?->addUse(NsidResolver::namespace("$ref"));
+            $resolved = NsidResolver::namespace("$ref");
+            $prefixed = NamespaceResolver::prefixed(ltrim($resolved, "\\"));
+
+            $this->class->getNamespace()?->addUse($prefixed);
         }
 
         $this->class->addProperty($this->property->name())

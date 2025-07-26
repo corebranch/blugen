@@ -3,6 +3,7 @@
 namespace Blugen\Service\Lexicon\V1\Factory;
 
 use Blugen\Service\Lexicon\GeneratorInterface;
+use Blugen\Service\Lexicon\LexiconInterface;
 use Blugen\Service\Lexicon\V1\ComponentGenerator\Field\ArrayComponentGenerator;
 use Blugen\Service\Lexicon\V1\ComponentGenerator\Field\BooleanComponentGenerator;
 use Blugen\Service\Lexicon\V1\ComponentGenerator\Field\BytesComponentGenerator;
@@ -22,7 +23,7 @@ use Blugen\Service\Lexicon\V1\ComponentGenerator\Field\TokenComponentGenerator;
 
 class ComponentGeneratorFactory
 {
-    public static function create(ClassType $class, Property $property): GeneratorInterface
+    public static function create(ClassType $class, Property $property, ?LexiconInterface $lexicon = null): GeneratorInterface
     {
         $type = $property->schema()->type();
 
@@ -38,7 +39,7 @@ class ComponentGeneratorFactory
             'cid-link' => new CidLinkComponentGenerator($class, $property),
             'blob' => new BlobComponentGenerator($class, $property),
             'token' => new TokenComponentGenerator($class, $property),
-            'ref' => new RefComponentGenerator($class, $property),
+            'ref' => new RefComponentGenerator($class, $property, $lexicon),
             'union' => new UnionComponentGenerator($class, $property),
             'unknown' => new UnknownComponentGenerator($class, $property),
             default => throw new \RuntimeException("Unsupported type: $type"),
