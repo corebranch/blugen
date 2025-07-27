@@ -3,7 +3,6 @@
 namespace Blugen\Tests\Unit\Service\Lexicon\V1\Resolver;
 
 use Blugen\Config\ConfigManager;
-use Blugen\Enum\PrimaryTypeEnum;
 use Blugen\Service\Lexicon\V1\Resolver\NamespaceResolver;
 use Blugen\Service\Lexicon\LexiconInterface;
 use Blugen\Service\Lexicon\DefinitionInterface;
@@ -27,7 +26,7 @@ class NamespaceResolverTest extends TestCase
         $this->definitionMock = $this->createMock(DefinitionInterface::class);
     }
 
-    public function test_namespace_generates_correct_namespace_and_classname_for_primary_type(): void
+    public function test_namespace_generates_correct_namespace_and_classname_for_non_main_definition(): void
     {
         $this->lexiconMock
             ->method('nsid')
@@ -53,47 +52,72 @@ class NamespaceResolverTest extends TestCase
         $this->assertSame('UserProfile', $className);
     }
 
-    public function test_namespace_fallbacks_to_last_nsid_part_for_non_primary_type(): void
+    public function test_namespace_uses_last_nsid_part_for_main_definition(): void
     {
         $this->lexiconMock
             ->method('nsid')
-            ->willReturn('app.custom.data');
+            ->willReturn('app.bsky.embed.record');
 
         $this->lexiconMock
             ->method('defs')
             ->willReturn([
-                'CustomData' => ['type' => 'x-custom'] // primary type deyil
+                'main' => ['type' => 'object']
             ]);
 
         $this->definitionMock
             ->method('name')
-            ->willReturn('CustomData');
+            ->willReturn('main');
 
         $this->definitionMock
             ->method('type')
-            ->willReturn(PrimaryTypeEnum::PROCEDURE->value);
+            ->willReturn('object');
 
         [$namespace, $className] = $this->resolver->namespace($this->lexiconMock, $this->definitionMock);
 
-        $this->assertSame('App\\Custom', $namespace);
-        $this->assertSame('Data', $className);
+        $this->assertSame('App\\Bsky\\Embed', $namespace);
+        $this->assertSame('Record', $className);
     }
 
-    public function test_path_generates_correct_filesystem_path(): void
+    public function test_path_generates_correct_filesystem_path_for_main_definition(): void
     {
         $this->lexiconMock
             ->method('nsid')
-            ->willReturn('app.system.config');
+            ->willReturn('app.bsky.feed.post');
 
         $this->lexiconMock
             ->method('defs')
             ->willReturn([
-                'SystemConfig' => ['type' => 'object']
+                'main' => ['type' => 'record']
             ]);
 
         $this->definitionMock
             ->method('name')
-            ->willReturn('SystemConfig');
+            ->willReturn('main');
+
+        $this->definitionMock
+            ->method('type')
+            ->willReturn('record');
+
+        $path = $this->resolver->path($this->lexiconMock, $this->definitionMock);
+
+        $this->assertSame('App/Bsky/Feed/Post.php', $path);
+    }
+
+    public function test_path_generates_correct_filesystem_path_for_non_main_definition(): void
+    {
+        $this->lexiconMock
+            ->method('nsid')
+            ->willReturn('app.bsky.embed.record');
+
+        $this->lexiconMock
+            ->method('defs')
+            ->willReturn([
+                'view' => ['type' => 'object']
+            ]);
+
+        $this->definitionMock
+            ->method('name')
+            ->willReturn('view');
 
         $this->definitionMock
             ->method('type')
@@ -101,7 +125,7 @@ class NamespaceResolverTest extends TestCase
 
         $path = $this->resolver->path($this->lexiconMock, $this->definitionMock);
 
-        $this->assertSame('App/System/Config/SystemConfig.php', $path);
+        $this->assertSame('App/Bsky/Embed/Record/View.php', $path);
     }
 
     public function test_it_throws_exception_if_definition_does_not_exist(): void

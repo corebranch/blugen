@@ -3,7 +3,6 @@
 namespace Blugen\Service\Lexicon\V1\Resolver;
 
 use Blugen\Config\ConfigManager;
-use Blugen\Enum\PrimaryTypeEnum;
 use Blugen\Service\Lexicon\DefinitionInterface;
 use Blugen\Service\Lexicon\LexiconInterface;
 
@@ -23,8 +22,8 @@ class NamespaceResolver
         $namespaceParts = array_map('ucfirst', explode('.', $lexicon->nsid()));
         $definitionName = toPascalCase($definition->name());
 
-        // If definition type is primary, override class name with last part of NSID
-        if (in_array($definition->type(), PrimaryTypeEnum::values(), true)) {
+        // If definition is named 'main', override class name with last part of NSID
+        if ($definition->name() === "main") {
             $definitionName = array_pop($namespaceParts);
         }
 
