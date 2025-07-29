@@ -35,7 +35,7 @@
     ],
     "scripts": {
         "generate": [
-            "./bin/blugen clear -e .gitignore",
+            "./bin/blugen clear -e .gitignore --force",
             "./bin/blugen generate",
             "php -l generated"
         ]
