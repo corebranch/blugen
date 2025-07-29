@@ -14,4 +14,5 @@ $container = require __DIR__ . "/../bootstrap/container.php";
 // Create and run the application
 $app = new Application('blugen');
 $app->add(new \Blugen\Command\Generate());
+$app->add(new \Blugen\Command\Clear());
 $app->run();
