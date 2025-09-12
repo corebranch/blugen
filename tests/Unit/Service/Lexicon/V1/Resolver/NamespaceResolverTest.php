@@ -19,7 +19,7 @@ class NamespaceResolverTest extends TestCase
         parent::setUp();
 
         // Set empty base namespace for tests using existing ConfigManager
-        container()->get(ConfigManager::class)->set('output.base_namespace', '');
+        config()->set('output.base_namespace', '');
 
         $this->resolver = new NamespaceResolver();
         $this->lexiconMock = $this->createMock(LexiconInterface::class);

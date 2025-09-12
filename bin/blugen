@@ -1,18 +1,34 @@
 #!/usr/bin/env php
 <?php
 
-use Composer\Autoload\ClassLoader;
-use Blugen\Config\ConfigManager;
+// Find and require autoloader - minimal logic needed to load Container class
+$autoloaderPaths = [
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php', 
+    __DIR__ . '/../../../vendor/autoload.php',
+];
+
+foreach ($autoloaderPaths as $path) {
+    if (file_exists($path)) {
+        require $path;
+        break;
+    }
+}
+
+use Blugen\Container;
+use Blugen\Command\Generate;
+use Blugen\Command\Clear;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\Config\FileLocator;
 
-$container = require __DIR__ . "/../bootstrap/container.php";
+try {
+    // Container handles all bootstrap logic automatically
+    $container = Container::get();
 
-// Create and run the application
-$app = new Application('blugen');
-$app->add(new \Blugen\Command\Generate());
-$app->add(new \Blugen\Command\Clear());
-$app->run();
+    $app = new Application('blugen');
+    $app->add(new Generate());
+    $app->add(new Clear());
+    $app->run();
+} catch (Exception $e) {
+    fwrite(STDERR, "Error: " . $e->getMessage() . "\n");
+    exit(1);
+}

@@ -23,6 +23,15 @@ class Container
         self::$container = $container;
     }
 
+    /**
+     * Reset the container for testing purposes
+     */
+    public static function reset(): void
+    {
+        self::$container = null;
+        self::$autoBootstrapAttempted = false;
+    }
+
     public static function get(): ContainerInterface
     {
         if (null === self::$container && !self::$autoBootstrapAttempted) {
@@ -43,11 +52,21 @@ class Container
         // Get the already loaded ClassLoader from Composer
         $classLoader = null;
 
-        // Try to get ClassLoader from registered autoloaders
-        foreach (spl_autoload_functions() as $autoloader) {
-            if (is_array($autoloader) && $autoloader[0] instanceof ClassLoader) {
-                $classLoader = $autoloader[0];
-                break;
+        // Allow custom bootstrap override
+        $input = new ArgvInput();
+        $bootstrap = $input->getParameterOption('--bootstrap');
+        if ($bootstrap && file_exists($bootstrap)) {
+            /** @var \Composer\Autoload\ClassLoader $classLoader */
+            $classLoader = require $bootstrap;
+        }
+
+        // If no custom bootstrap, try to get ClassLoader from registered autoloaders
+        if (!$classLoader) {
+            foreach (spl_autoload_functions() as $autoloader) {
+                if (is_array($autoloader) && $autoloader[0] instanceof ClassLoader) {
+                    $classLoader = $autoloader[0];
+                    break;
+                }
             }
         }
 
@@ -55,8 +74,7 @@ class Container
         if (!$classLoader) {
             $possibleAutoloaders = [
                 __DIR__ . '/../../../../autoload.php',              // When installed in vendor/shahmal1yev/blugen
-                __DIR__ . '/../vendor/autoload.php',               // When using the package directly
-                __DIR__ . '/../../../vendor/autoload.php',         // Alternative location
+                __DIR__ . '/../vendor/autoload.php',                // When using the package directly
             ];
 
             foreach ($possibleAutoloaders as $file) {

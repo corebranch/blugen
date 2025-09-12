@@ -26,7 +26,7 @@ class NsidResolver
     {
         $id = $nsid->id();
         $ds = DIRECTORY_SEPARATOR;
-        $basePath = rtrim(container()->get(ConfigManager::class)->get('lexicons.source'), $ds);
+        $basePath = rtrim(config()->get('lexicons.source'), $ds);
         $path = str_replace(".", $ds, $id);
 
         return $basePath . $ds . $path . ".json";

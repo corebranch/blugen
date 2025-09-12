@@ -2,11 +2,13 @@
 
 namespace Blugen\Tests;
 
+use Blugen\Container;
+
 class TestCase extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        require_once __DIR__ . "/../bootstrap/container.php";
+        Container::reset();
     }
 }
