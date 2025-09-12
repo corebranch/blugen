@@ -24,6 +24,7 @@ class Bootstrap
             return self::buildContainer($classLoader, $configManager);
         } catch (\Throwable $e) {
             self::handleBootstrapError($e);
+            exit(1);
         }
     }
 
