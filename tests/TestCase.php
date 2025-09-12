@@ -11,4 +11,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
         parent::setUp();
         Container::reset();
     }
+
+    protected function tearDown(): void
+    {
+        Container::reset();
+        parent::tearDown();
+    }
 }

@@ -1,34 +1,15 @@
 #!/usr/bin/env php
 <?php
 
-// Find and require autoloader - minimal logic needed to load Container class
-$autoloaderPaths = [
-    __DIR__ . '/../../../autoload.php',
-    __DIR__ . '/../vendor/autoload.php', 
-    __DIR__ . '/../../../vendor/autoload.php',
-];
+require_once "vendor/autoload.php";
 
-foreach ($autoloaderPaths as $path) {
-    if (file_exists($path)) {
-        require $path;
-        break;
-    }
-}
-
-use Blugen\Container;
-use Blugen\Command\Generate;
+use Blugen\App;
 use Blugen\Command\Clear;
-use Symfony\Component\Console\Application;
+use Blugen\Command\Generate;
 
-try {
-    // Container handles all bootstrap logic automatically
-    $container = Container::get();
+\Blugen\Container::get();
 
-    $app = new Application('blugen');
-    $app->add(new Generate());
-    $app->add(new Clear());
-    $app->run();
-} catch (Exception $e) {
-    fwrite(STDERR, "Error: " . $e->getMessage() . "\n");
-    exit(1);
-}
+$app = new App('blugen');
+$app->add(new Generate());
+$app->add(new Clear());
+$app->run();
