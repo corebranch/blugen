@@ -56,6 +56,10 @@ class StringGenerator implements GeneratorInterface
 
     private function addEnumCase(string $value): void
     {
+        if (! $this->shouldInclude($value)) {
+            return;
+        }
+
         $caseInfo = $this->processCaseValue($value);
 
         $this->enum
@@ -127,5 +131,14 @@ class StringGenerator implements GeneratorInterface
         }
 
         return strtoupper($normalized);
+    }
+
+    private function shouldInclude(string $value): bool
+    {
+        if ($this->isReference($value)) {
+            return str_starts_with($value, $this->definition->lexicon()->nsid());
+        }
+
+        return true;
     }
 }
