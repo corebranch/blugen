@@ -23,12 +23,12 @@ use Blugen\Service\Lexicon\V1\ComponentGenerator\Field\TokenComponentGenerator;
 
 class ComponentGeneratorFactory
 {
-    public static function create(ClassType $class, Property $property, ?LexiconInterface $lexicon = null): GeneratorInterface
+    public static function create(ClassType $class, Property $property, ?LexiconInterface $lexicon = null, ?GeneratorInterface $context = null): GeneratorInterface
     {
         $type = $property->schema()->type();
 
         return match($type) {
-            'string' => new StringComponentGenerator($class, $property),
+            'string' => new StringComponentGenerator($class, $property, $context),
             'object' => new ObjectComponentGenerator($class, $property),
             'integer' => new IntegerComponentGenerator($class, $property),
             'boolean' => new BooleanComponentGenerator($class, $property),
