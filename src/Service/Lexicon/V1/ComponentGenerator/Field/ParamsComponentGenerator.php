@@ -2,6 +2,8 @@
 
 namespace Blugen\Service\Lexicon\V1\ComponentGenerator\Field;
 
+use Blugen\Service\Lexicon\ArraySerialization\ArrayField;
+use Blugen\Service\Lexicon\ArraySerialization\ArraySerializationContributor;
 use Blugen\Service\Lexicon\GeneratorInterface;
 use Blugen\Service\Lexicon\V1\Factory\ComponentGeneratorFactory;
 use Blugen\Service\Lexicon\V1\Property;
@@ -9,14 +11,15 @@ use Blugen\Service\Lexicon\V1\TypeSpecificSchema\Field\ParamsSchema;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Literal;
 
-class ParamsComponentGenerator implements GeneratorInterface
+class ParamsComponentGenerator implements GeneratorInterface, ArraySerializationContributor
 {
     private readonly ParamsSchema $schema;
     private readonly ClassType $anonClass;
 
     public function __construct(
         private readonly ClassType $class,
-        private readonly Property $property
+        private readonly Property $property,
+        private readonly ?GeneratorInterface $context = null,
     ) {
         $this->schema = new ParamsSchema($this->property->schema());
         $this->anonClass = new ClassType(null);
@@ -76,5 +79,10 @@ class ParamsComponentGenerator implements GeneratorInterface
             ->setPublic()
             ->setReturnType('object')
             ->setBody("return \$this->{$this->property->name()};");
+    }
+
+    public function toArrayField(): ArrayField
+    {
+        // TODO: Implement toArrayField() method.
     }
 }

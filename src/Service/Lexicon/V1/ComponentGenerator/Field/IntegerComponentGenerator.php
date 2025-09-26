@@ -2,18 +2,22 @@
 
 namespace Blugen\Service\Lexicon\V1\ComponentGenerator\Field;
 
+use Blugen\Service\Lexicon\ArraySerialization\ArrayField;
+use Blugen\Service\Lexicon\ArraySerialization\ArraySerializationContext;
+use Blugen\Service\Lexicon\ArraySerialization\ArraySerializationContributor;
 use Blugen\Service\Lexicon\GeneratorInterface;
 use Blugen\Service\Lexicon\V1\Property;
 use Blugen\Service\Lexicon\V1\TypeSpecificSchema\Field\IntegerSchema;
 use Nette\PhpGenerator\ClassType;
 
-class IntegerComponentGenerator implements GeneratorInterface
+class IntegerComponentGenerator implements GeneratorInterface, ArraySerializationContributor
 {
     private readonly IntegerSchema $schema;
 
     public function __construct(
         private readonly ClassType $class,
-        private readonly Property $property
+        private readonly Property $property,
+        private readonly ?GeneratorInterface $context = null,
     ) {
         $this->schema = new IntegerSchema($this->property->schema());
     }
@@ -23,6 +27,7 @@ class IntegerComponentGenerator implements GeneratorInterface
         $this->generateProperty();
         $this->generateGetter();
         $this->generateSetter();
+        $this->addToArrayFragment();
     }
 
     private function generateProperty(): void
@@ -136,5 +141,20 @@ class IntegerComponentGenerator implements GeneratorInterface
     private function description(): string
     {
         return $this->property->description() ? "\n\n" . $this->property->description() : '';
+    }
+
+    private function addToArrayFragment(): void
+    {
+        if ($this->context instanceof ArraySerializationContext) {
+            $this->context->addField($this->toArrayField());
+        }
+    }
+
+    public function toArrayField(): ArrayField
+    {
+        $key = $this->property->name();
+        $expression = "\$this->$key";
+
+        return new ArrayField($key, $expression);
     }
 }

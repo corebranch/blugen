@@ -2,6 +2,9 @@
 
 namespace Blugen\Service\Lexicon\V1\ComponentGenerator\Field;
 
+use Blugen\Service\Lexicon\ArraySerialization\ArrayField;
+use Blugen\Service\Lexicon\ArraySerialization\ArraySerializationContext;
+use Blugen\Service\Lexicon\ArraySerialization\ArraySerializationContributor;
 use Blugen\Service\Lexicon\GeneratorInterface;
 use Blugen\Service\Lexicon\LexiconInterface;
 use Blugen\Service\Lexicon\V1\Property;
@@ -10,7 +13,7 @@ use Blugen\Service\Lexicon\V1\Resolver\NsidResolver;
 use Blugen\Service\Lexicon\V1\TypeSpecificSchema\Field\RefSchema;
 use Nette\PhpGenerator\ClassType;
 
-class RefComponentGenerator implements GeneratorInterface
+class RefComponentGenerator implements GeneratorInterface, ArraySerializationContributor
 {
     private readonly RefSchema $schema;
 
@@ -18,6 +21,7 @@ class RefComponentGenerator implements GeneratorInterface
         private readonly ClassType $class,
         private readonly Property $property,
         private readonly ?LexiconInterface $lexicon = null,
+        private readonly ?GeneratorInterface $context = null,
     ) {
         $this->schema = new RefSchema($this->property->schema());
     }
@@ -46,7 +50,7 @@ class RefComponentGenerator implements GeneratorInterface
     {
         $name = $this->property->name();
 
-        $this->class->addMethod('get' . ucfirst($name))
+        $this->class->addMethod($this->getterName())
             ->setPublic()
             ->setReturnType($this->phpType())
             ->setBody("return \$this->{$name};")
@@ -96,5 +100,25 @@ class RefComponentGenerator implements GeneratorInterface
         return $this->property->description()
             ? "\n\n" . $this->property->description()
             : '';
+    }
+
+    private function getterName(): string
+    {
+        return 'get' . ucfirst($this->property->name());
+    }
+
+    private function addToArrayFragment(): void
+    {
+        if ($this->context instanceof ArraySerializationContext) {
+            $this->context->addField($this->toArrayField());
+        }
+    }
+
+    public function toArrayField(): ArrayField
+    {
+        $key = $this->property->name();
+        $expression = "{$this->getterName()}()";
+
+        return new ArrayField($key, $expression);
     }
 }

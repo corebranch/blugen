@@ -13,7 +13,8 @@ class ObjectComponentGenerator implements GeneratorInterface
 {
     public function __construct(
         private readonly ClassType $class,
-        private readonly Property $property
+        private readonly Property $property,
+        private readonly ?GeneratorInterface $context = null,
     ) {}
 
     public function generate(): void

@@ -2,7 +2,7 @@
 
 namespace Blugen\Service\Lexicon\ArraySerialization;
 
-final class ArrayField implements \Stringable
+class ArrayField implements \Stringable
 {
     public function __construct(
         private readonly string $key,

@@ -2,16 +2,15 @@
 
 namespace Blugen\Service\Lexicon\V1\ComponentGenerator\Field;
 
-use Blugen\Service\Lexicon\Arrayable\Arrayable;
-use Blugen\Service\Lexicon\Arrayable\ArrayableDefinition;
-use Blugen\Service\Lexicon\Arrayable\HasToArrayFragment;
-use Blugen\Service\Lexicon\Arrayable\ToArrayFragment;
+use Blugen\Service\Lexicon\ArraySerialization\ArrayField;
+use Blugen\Service\Lexicon\ArraySerialization\ArraySerializationContext;
+use Blugen\Service\Lexicon\ArraySerialization\ArraySerializationContributor;
 use Blugen\Service\Lexicon\GeneratorInterface;
 use Blugen\Service\Lexicon\V1\Property;
 use Blugen\Service\Lexicon\V1\TypeSpecificSchema\Field\StringSchema;
 use Nette\PhpGenerator\ClassType;
 
-class StringComponentGenerator implements GeneratorInterface, HasToArrayFragment
+class StringComponentGenerator implements GeneratorInterface, ArraySerializationContributor
 {
     private readonly StringSchema $schema;
 
@@ -159,16 +158,16 @@ class StringComponentGenerator implements GeneratorInterface, HasToArrayFragment
 
     private function addToArrayFragment(): void
     {
-        if ($this->context instanceof ArrayableDefinition && in_array(Arrayable::class, $this->class->getImplements(), true)) {
-            $this->context->addFragment($this->toArrayFragment());
+        if ($this->context instanceof ArraySerializationContext) {
+            $this->context->addField($this->toArrayField());
         }
     }
 
-    public function toArrayFragment(): ToArrayFragment
+    public function toArrayField(): ArrayField
     {
         $key = $this->property->name();
         $expression = "\$this->$key";
 
-        return new ToArrayFragment($key, $expression);
+        return new ArrayField($key, $expression);
     }
 }
