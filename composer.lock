@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d59582aa7dc65ee3a92de2ba735b7bc",
+    "content-hash": "132bd10df903e3fb4cfc6bd25721242a",
     "packages": [
         {
             "name": "kongulov/interact-with-enum",
@@ -1744,6 +1744,131 @@
                 }
             ],
             "time": "2025-08-18T13:06:32+00:00"
+        },
+        {
+            "name": "toobo/bcp47",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Toobo/bcp47.git",
+                "reference": "3f29f625a1aabbe11679855befd0ea30b9160737"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Toobo/bcp47/zipball/3f29f625a1aabbe11679855befd0ea30b9160737",
+                "reference": "3f29f625a1aabbe11679855befd0ea30b9160737",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 8.3 < 8.5",
+                "wikimedia/bcp-47-code": "^1|^2"
+            },
+            "require-dev": {
+                "inpsyde/php-coding-standards": "^2@dev",
+                "phpcompatibility/php-compatibility": "dev-develop as 9.3.6",
+                "phpunit/phpunit": "^10.5.37",
+                "vimeo/psalm": "^5.26.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Toobo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Giuseppe Mazzapica",
+                    "email": "giuseppe.mazzapica@gmail.com",
+                    "homepage": "https://gmazzap.me",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP utility functions to validate and normalize IETF BCP 47 language tag.",
+            "homepage": "https://github.com/Toobo/bcp47/",
+            "keywords": [
+                "BCP-47",
+                "bcp 47",
+                "bcp47",
+                "html lang",
+                "html lang attribute",
+                "html language",
+                "ietf",
+                "ietf bcp 47",
+                "ietf bcp-47",
+                "ietf bcp47",
+                "ietf language",
+                "ietf language tag",
+                "ietf tag",
+                "lang",
+                "language",
+                "language tag",
+                "locale"
+            ],
+            "support": {
+                "issues": "https://github.com/Toobo/bcp47/issues",
+                "source": "https://github.com/Toobo/bcp47/tree/1.0.0"
+            },
+            "time": "2024-10-22T13:19:22+00:00"
+        },
+        {
+            "name": "wikimedia/bcp-47-code",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wikimedia/mediawiki-libs-Bcp47Code.git",
+                "reference": "bface192672b0c743152d0b838475c139ba0a1e0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wikimedia/mediawiki-libs-Bcp47Code/zipball/bface192672b0c743152d0b838475c139ba0a1e0",
+                "reference": "bface192672b0c743152d0b838475c139ba0a1e0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4.3"
+            },
+            "require-dev": {
+                "mediawiki/mediawiki-codesniffer": "45.0.0",
+                "mediawiki/mediawiki-phan-config": "0.14.0",
+                "mediawiki/minus-x": "1.1.3",
+                "ockcyp/covers-validator": "1.6.0",
+                "php-parallel-lint/php-console-highlighter": "1.0.0",
+                "php-parallel-lint/php-parallel-lint": "1.4.0",
+                "phpunit/phpunit": "9.6.16",
+                "wikimedia/update-history": "1.0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wikimedia\\Bcp47Code\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "C. Scott Ananian",
+                    "email": "cananian@wikimedia.org",
+                    "homepage": "https://cscott.net"
+                }
+            ],
+            "description": "Simple interface representing languages which have a BCP 47 code",
+            "homepage": "https://www.mediawiki.org/wiki/Bcp47Code",
+            "support": {
+                "source": "https://github.com/wikimedia/mediawiki-libs-Bcp47Code/tree/v2.0.1"
+            },
+            "time": "2024-11-09T06:09:54+00:00"
         }
     ],
     "packages-dev": [
