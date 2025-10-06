@@ -2,10 +2,10 @@
 
 namespace Blugen\Service\Syntax\Constraints\StringType\Format\Language;
 
+use Blugen\Service\Bcp47\Bcp47;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Toobo\Bcp47;
 
 class LanguageValidator extends ConstraintValidator
 {
