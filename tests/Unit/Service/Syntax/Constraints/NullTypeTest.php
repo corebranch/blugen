@@ -18,7 +18,7 @@ class NullTypeTest extends ConstraintValidatorTestCase
 
     public function test_null_is_valid(): void
     {
-        $constraint = new NullType();
+        $constraint = new NullType([]);
 
         $this->validator->validate(null, $constraint);
 
@@ -30,7 +30,7 @@ class NullTypeTest extends ConstraintValidatorTestCase
     {
         $this->expectException(UnexpectedTypeException::class);
 
-        $constraint = new NullType();
+        $constraint = new NullType([]);
 
         $this->validator->validate($value, $constraint);
     }
@@ -51,6 +51,6 @@ class NullTypeTest extends ConstraintValidatorTestCase
     {
         $this->expectException(UnexpectedTypeException::class);
 
-        $this->validator->validate(null, new StringType());
+        $this->validator->validate(null, new StringType([]));
     }
 }

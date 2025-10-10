@@ -19,7 +19,7 @@ class BooleanTypeTest extends ConstraintValidatorTestCase
     #[DataProvider('validBooleanProvider')]
     public function test_valid_boolean_values(bool $value): void
     {
-        $constraint = new BooleanType();
+        $constraint = new BooleanType([]);
 
         $this->validator->validate($value, $constraint);
 
@@ -39,7 +39,7 @@ class BooleanTypeTest extends ConstraintValidatorTestCase
     {
         $this->expectException(UnexpectedTypeException::class);
 
-        $constraint = new BooleanType();
+        $constraint = new BooleanType([]);
         $this->validator->validate($invalidValue, $constraint);
     }
 
@@ -84,7 +84,7 @@ class BooleanTypeTest extends ConstraintValidatorTestCase
 
     public function test_false_value_is_valid(): void
     {
-        $constraint = new BooleanType();
+        $constraint = new BooleanType([]);
 
         $this->validator->validate(false, $constraint);
 
@@ -93,7 +93,7 @@ class BooleanTypeTest extends ConstraintValidatorTestCase
 
     public function test_true_value_is_valid(): void
     {
-        $constraint = new BooleanType();
+        $constraint = new BooleanType([]);
 
         $this->validator->validate(true, $constraint);
 

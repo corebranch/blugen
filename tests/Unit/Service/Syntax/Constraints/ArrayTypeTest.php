@@ -33,7 +33,7 @@ class ArrayTypeTest extends ConstraintValidatorTestCase
         $this->expectException(UnexpectedTypeException::class);
 
         // Using wrong constraint intentionally
-        $this->validator->validate([], new StringType());
+        $this->validator->validate([], new StringType([]));
     }
 
     public function test_valid_when_items_are_all_valid(): void
