@@ -79,8 +79,8 @@ class ArrayComponentGenerator implements GeneratorInterface, ArraySerializationC
             $lines[] = "@length " . ($min ?? '0') . '-' . ($max ?? '∞');
         }
 
-        if ($this->schema->items()) {
-            $lines[] = "@items " . $this->schema->items();
+        if ($itemsType = $this->schema->items()['type']) {
+            $lines[] = "@items " . $itemsType;
         }
 
         return $lines;
@@ -93,7 +93,7 @@ class ArrayComponentGenerator implements GeneratorInterface, ArraySerializationC
 
     private function docType(): string
     {
-        $itemType = $this->schema->items();
+        $itemType = $this->schema->items()['type'];
 
         $base = $itemType ? $itemType . '[]' : 'array';
 
