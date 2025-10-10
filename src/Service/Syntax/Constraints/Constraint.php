@@ -6,7 +6,7 @@ trait Constraint
 {
     public array $schema;
 
-    public function __construct(array $schema = [])
+    public function __construct(array $schema)
     {
         $options = ['schema' => $schema];
         parent::__construct($options);
