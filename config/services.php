@@ -8,6 +8,8 @@ use Blugen\Service\Lexicon\ReaderInterface;
 use Blugen\Service\Lexicon\V1\Generator as LexiconGenerator;
 use Blugen\Service\Lexicon\V1\Nsid;
 use Blugen\Service\Lexicon\V1\Reader;
+use Blugen\Service\Syntax\Factory\ConstraintFactory;
+use Blugen\Service\Syntax\Factory\SchemaFactory;
 use Blugen\Service\Xrpc\Client;
 use Blugen\Service\Xrpc\ClientInterface;
 use Composer\Autoload\ClassLoader;
@@ -33,5 +35,11 @@ return static function (ContainerConfigurator $container): void {
 
     $services->set(Client::class)
         ->alias(ClientInterface::class, Client::class)
+        ->public();
+
+    $services->set(SchemaFactory::class)
+        ->public();
+
+    $services->set(ConstraintFactory::class)
         ->public();
 };
