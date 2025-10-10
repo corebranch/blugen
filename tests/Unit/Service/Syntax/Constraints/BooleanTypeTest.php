@@ -4,7 +4,6 @@ namespace Blugen\Tests\Unit\Service\Syntax\Constraints;
 
 use Blugen\Service\Syntax\Constraints\BooleanType\BooleanType;
 use Blugen\Service\Syntax\Constraints\BooleanType\BooleanTypeValidator;
-use JetBrains\PhpStorm\Pure;
 use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -44,7 +43,6 @@ class BooleanTypeTest extends ConstraintValidatorTestCase
         $this->validator->validate($invalidValue, $constraint);
     }
 
-    #[Pure]
     public static function invalidBooleanProvider(): array
     {
         return [
