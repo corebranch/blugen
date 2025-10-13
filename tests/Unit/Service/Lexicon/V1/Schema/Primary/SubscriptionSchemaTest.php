@@ -1,12 +1,12 @@
 <?php
 
-namespace Blugen\Tests\Unit\Service\Lexicon\V1\TypeSpecificSchema\Primary;
+namespace Blugen\Tests\Unit\Service\Lexicon\V1\Schema\Primary;
 
 use Blugen\Service\Lexicon\V1\Schema;
 use Blugen\Service\Lexicon\V1\Schema\Container\ParamsSchema;
-use Blugen\Service\Lexicon\V1\Schema\Primary\QuerySchema;
+use Blugen\Service\Lexicon\V1\Schema\Primary\SubscriptionSchema;
 use Blugen\Service\Lexicon\V1\Schema\Support\ErrorsSchema;
-use Blugen\Service\Lexicon\V1\Schema\Support\OutputSchema;
+use Blugen\Service\Lexicon\V1\Schema\Support\MessageSchema;
 use Blugen\Tests\TestCase;
 use Blugen\Tests\Unit\Traits\WithArrayableTestTrait;
 use Blugen\Tests\Unit\Traits\WithGetTestTrait;
@@ -14,7 +14,7 @@ use Blugen\Tests\Unit\Traits\WithSchema;
 use Blugen\Tests\Unit\Traits\WithSchemaTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class QuerySchemaTest extends TestCase
+class SubscriptionSchemaTest extends TestCase
 {
     use WithSchema;
     use WithGetTestTrait;
@@ -25,7 +25,7 @@ class QuerySchemaTest extends TestCase
     {
         return [
             ['parameters'],
-            ['output'],
+            ['message'],
             ['errors'],
         ];
     }
@@ -63,10 +63,10 @@ class QuerySchemaTest extends TestCase
             'expectedToArrayResult' => ['foo', 'dag', 'cbor']
         ];
 
-        yield 'output field' => [
-            'fieldName' => 'output',
-            'expectedInstanceOfFQCN' => OutputSchema::class,
-            'expectedToArrayResult' => [[false, 'string', 0]]
+        yield 'message field' => [
+            'fieldName' => 'message',
+            'expectedInstanceOfFQCN' => MessageSchema::class,
+            'expectedToArrayResult' => [false, 'string', 0, true]
         ];
 
         yield 'errors field' => [
@@ -79,8 +79,9 @@ class QuerySchemaTest extends TestCase
         ];
     }
 
-    private function schema(array $content): QuerySchema
+
+    private function schema(array $content): SubscriptionSchema
     {
-        return new QuerySchema(new Schema($content));
+        return new SubscriptionSchema(new Schema($content));
     }
 }

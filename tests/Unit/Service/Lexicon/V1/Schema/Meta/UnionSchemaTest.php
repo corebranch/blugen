@@ -1,6 +1,6 @@
 <?php
 
-namespace Blugen\Tests\Unit\Service\Lexicon\V1\TypeSpecificSchema\Field;
+namespace Blugen\Tests\Unit\Service\Lexicon\V1\Schema\Meta;
 
 use Blugen\Service\Lexicon\V1\Schema;
 use Blugen\Service\Lexicon\V1\Schema\Meta\UnionSchema;

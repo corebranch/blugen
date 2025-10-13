@@ -1,12 +1,11 @@
 <?php
 
-namespace Blugen\Tests\Unit\Service\Lexicon\V1\TypeSpecificSchema\Primary;
+namespace Blugen\Tests\Unit\Service\Lexicon\V1\Schema\Primary;
 
 use Blugen\Service\Lexicon\V1\Schema;
 use Blugen\Service\Lexicon\V1\Schema\Container\ParamsSchema;
-use Blugen\Service\Lexicon\V1\Schema\Primary\ProcedureSchema;
+use Blugen\Service\Lexicon\V1\Schema\Primary\QuerySchema;
 use Blugen\Service\Lexicon\V1\Schema\Support\ErrorsSchema;
-use Blugen\Service\Lexicon\V1\Schema\Support\InputSchema;
 use Blugen\Service\Lexicon\V1\Schema\Support\OutputSchema;
 use Blugen\Tests\TestCase;
 use Blugen\Tests\Unit\Traits\WithArrayableTestTrait;
@@ -15,7 +14,7 @@ use Blugen\Tests\Unit\Traits\WithSchema;
 use Blugen\Tests\Unit\Traits\WithSchemaTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class ProcedureSchemaTest extends TestCase
+class QuerySchemaTest extends TestCase
 {
     use WithSchema;
     use WithGetTestTrait;
@@ -27,7 +26,6 @@ class ProcedureSchemaTest extends TestCase
         return [
             ['parameters'],
             ['output'],
-            ['input'],
             ['errors'],
         ];
     }
@@ -46,7 +44,7 @@ class ProcedureSchemaTest extends TestCase
     public function test_field_returns_expected_value(
         string $fieldName,
         string $expectedInstanceOfFQCN,
-        array $expectedToArrayResult
+        array  $expectedToArrayResult
     ): void
     {
         $schema = $this->schema([
@@ -71,12 +69,6 @@ class ProcedureSchemaTest extends TestCase
             'expectedToArrayResult' => [[false, 'string', 0]]
         ];
 
-        yield 'input field' => [
-            'fieldName' => 'input',
-            'expectedInstanceOfFQCN' => InputSchema::class,
-            'expectedToArrayResult' => [false, 'string', 0, true]
-        ];
-
         yield 'errors field' => [
             'fieldName' => 'errors',
             'expectedInstanceOfFQCN' => ErrorsSchema::class,
@@ -87,8 +79,8 @@ class ProcedureSchemaTest extends TestCase
         ];
     }
 
-    private function schema(array $content): ProcedureSchema
+    private function schema(array $content): QuerySchema
     {
-        return new ProcedureSchema(new Schema($content));
+        return new QuerySchema(new Schema($content));
     }
 }

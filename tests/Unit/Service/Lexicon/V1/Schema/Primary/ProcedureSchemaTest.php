@@ -1,12 +1,13 @@
 <?php
 
-namespace Blugen\Tests\Unit\Service\Lexicon\V1\TypeSpecificSchema\Primary;
+namespace Blugen\Tests\Unit\Service\Lexicon\V1\Schema\Primary;
 
 use Blugen\Service\Lexicon\V1\Schema;
 use Blugen\Service\Lexicon\V1\Schema\Container\ParamsSchema;
-use Blugen\Service\Lexicon\V1\Schema\Primary\SubscriptionSchema;
+use Blugen\Service\Lexicon\V1\Schema\Primary\ProcedureSchema;
 use Blugen\Service\Lexicon\V1\Schema\Support\ErrorsSchema;
-use Blugen\Service\Lexicon\V1\Schema\Support\MessageSchema;
+use Blugen\Service\Lexicon\V1\Schema\Support\InputSchema;
+use Blugen\Service\Lexicon\V1\Schema\Support\OutputSchema;
 use Blugen\Tests\TestCase;
 use Blugen\Tests\Unit\Traits\WithArrayableTestTrait;
 use Blugen\Tests\Unit\Traits\WithGetTestTrait;
@@ -14,7 +15,7 @@ use Blugen\Tests\Unit\Traits\WithSchema;
 use Blugen\Tests\Unit\Traits\WithSchemaTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class SubscriptionSchemaTest extends TestCase
+class ProcedureSchemaTest extends TestCase
 {
     use WithSchema;
     use WithGetTestTrait;
@@ -25,7 +26,8 @@ class SubscriptionSchemaTest extends TestCase
     {
         return [
             ['parameters'],
-            ['message'],
+            ['output'],
+            ['input'],
             ['errors'],
         ];
     }
@@ -44,7 +46,7 @@ class SubscriptionSchemaTest extends TestCase
     public function test_field_returns_expected_value(
         string $fieldName,
         string $expectedInstanceOfFQCN,
-        array  $expectedToArrayResult
+        array $expectedToArrayResult
     ): void
     {
         $schema = $this->schema([
@@ -63,9 +65,15 @@ class SubscriptionSchemaTest extends TestCase
             'expectedToArrayResult' => ['foo', 'dag', 'cbor']
         ];
 
-        yield 'message field' => [
-            'fieldName' => 'message',
-            'expectedInstanceOfFQCN' => MessageSchema::class,
+        yield 'output field' => [
+            'fieldName' => 'output',
+            'expectedInstanceOfFQCN' => OutputSchema::class,
+            'expectedToArrayResult' => [[false, 'string', 0]]
+        ];
+
+        yield 'input field' => [
+            'fieldName' => 'input',
+            'expectedInstanceOfFQCN' => InputSchema::class,
             'expectedToArrayResult' => [false, 'string', 0, true]
         ];
 
@@ -79,9 +87,8 @@ class SubscriptionSchemaTest extends TestCase
         ];
     }
 
-
-    private function schema(array $content): SubscriptionSchema
+    private function schema(array $content): ProcedureSchema
     {
-        return new SubscriptionSchema(new Schema($content));
+        return new ProcedureSchema(new Schema($content));
     }
 }
