@@ -1,6 +1,6 @@
 <?php
 
-namespace Blugen\Tests\Unit\Service\Lexicon\V1\TypeSpecificSchema\Primary;
+namespace Blugen\Tests\Unit\Service\Lexicon\V1\Schema\Primary;
 
 use Blugen\Service\Lexicon\V1\Schema;
 use Blugen\Service\Lexicon\V1\Schema\Container\ObjectSchema;
