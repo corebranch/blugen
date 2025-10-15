@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
-## [Unreleased]
+## [1.0.0-alpha.2] - 2025-10-15
 
 ### Breaking
 - SchemaInterface now requires `toArray(): array`.
@@ -90,5 +90,5 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 - Release automation and workflow adjustments for publishing the 1.x pre-release.
 
 ---
-[Unreleased]: https://github.com/corebranch/blugen/compare/1.0.0-alpha.1...1.x
+[1.0.0-alpha.2]: https://github.com/corebranch/blugen/compare/1.0.0-alpha.1..1.0.0-alpha.2
 [1.0.0-alpha.1]: https://github.com/corebranch/blugen/releases/tag/1.0.0-alpha.1
